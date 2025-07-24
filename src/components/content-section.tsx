@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, User, ArrowLeft } from "lucide-react"
+import { Calendar, User, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 
@@ -14,14 +14,13 @@ interface Post {
   featured: boolean;
   image_url: string | null;
   created_at: string;
-  profiles: {
-    display_name: string | null;
-  } | null;
+  author_id: string;
 }
 
 export function ContentSection() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -32,13 +31,10 @@ export function ContentSection() {
     try {
       const { data, error } = await supabase
         .from('posts')
-        .select(`
-          *,
-          profiles!posts_author_id_fkey(display_name)
-        `)
+        .select('*')
         .eq('published', true)
         .order('created_at', { ascending: false })
-        .limit(3);
+        .limit(5);
 
       if (error) {
         console.error('Error fetching posts:', error);
@@ -61,6 +57,14 @@ export function ContentSection() {
       day: 'numeric'
     }).format(date);
   };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % Math.max(1, posts.length - 2));
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + Math.max(1, posts.length - 2)) % Math.max(1, posts.length - 2));
+  };
   return (
     <section className="py-16 bg-gradient-energy">
       <div className="container mx-auto px-4">
@@ -74,22 +78,25 @@ export function ContentSection() {
         </div>
 
         {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {[...Array(3)].map((_, i) => (
-              <Card key={i} className="bg-card/80 backdrop-blur-sm animate-pulse">
-                <CardHeader>
-                  <div className="h-6 bg-muted rounded w-3/4"></div>
-                  <div className="h-4 bg-muted rounded w-full"></div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-muted rounded w-1/2"></div>
+          <div className="relative max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[...Array(3)].map((_, i) => (
+                <Card key={i} className="bg-card/80 backdrop-blur-sm animate-pulse">
+                  <div className="h-48 bg-muted rounded-t-lg"></div>
+                  <CardHeader>
+                    <div className="h-6 bg-muted rounded w-3/4"></div>
                     <div className="h-4 bg-muted rounded w-full"></div>
-                    <div className="h-4 bg-muted rounded w-3/4"></div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-muted rounded w-1/2"></div>
+                      <div className="h-4 bg-muted rounded w-full"></div>
+                      <div className="h-4 bg-muted rounded w-3/4"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-16">
@@ -98,59 +105,108 @@ export function ContentSection() {
             </p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {posts.map((post) => (
-              <Card 
-                key={post.id} 
-                className="bg-card/80 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-all duration-300 hover:scale-105 animate-energy-pulse"
+          <div className="relative max-w-7xl mx-auto">
+            {/* Navigation buttons */}
+            {posts.length > 3 && (
+              <>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm border-primary/30 hover:border-primary"
+                  onClick={nextSlide}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm border-primary/30 hover:border-primary"
+                  onClick={prevSlide}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </>
+            )}
+
+            {/* Slideshow container */}
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ 
+                  transform: `translateX(${currentSlide * (100 / 3)}%)`,
+                  width: `${(posts.length / 3) * 100}%`
+                }}
               >
-                {post.image_url && (
-                  <div className="h-48 overflow-hidden rounded-t-lg">
-                    <img 
-                      src={post.image_url} 
-                      alt={post.title}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                    />
+                {posts.map((post) => (
+                  <div key={post.id} className="w-1/3 flex-shrink-0 px-4">
+                    <Card className="bg-card/80 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-all duration-300 hover:scale-105 animate-fade-in h-full">
+                      {post.image_url && (
+                        <div className="h-48 overflow-hidden rounded-t-lg">
+                          <img 
+                            src={post.image_url} 
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                          />
+                        </div>
+                      )}
+                      
+                      <CardHeader>
+                        <CardTitle className="text-right text-foreground hover:text-primary transition-colors line-clamp-2">
+                          {post.title}
+                        </CardTitle>
+                        <CardDescription className="text-right text-muted-foreground line-clamp-2">
+                          {post.description}
+                        </CardDescription>
+                      </CardHeader>
+                      
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
+                          <div className="flex items-center">
+                            <Calendar className="w-4 h-4 ml-1" />
+                            {formatDate(post.created_at)}
+                          </div>
+                          <div className="flex items-center">
+                            <User className="w-4 h-4 ml-1" />
+                            ادمین
+                          </div>
+                        </div>
+                        
+                        <p className="text-foreground/80 text-right leading-relaxed line-clamp-2">
+                          {post.content}
+                        </p>
+                        
+                        <Link to={`/posts/${post.id}`}>
+                          <Button 
+                            variant="outline" 
+                            className="w-full border-primary/30 hover:border-primary hover:bg-primary/10"
+                          >
+                            مطالعه بیشتر
+                            <ArrowLeft className="mr-2 w-4 h-4" />
+                          </Button>
+                        </Link>
+                      </CardContent>
+                    </Card>
                   </div>
-                )}
-                
-                <CardHeader>
-                  <CardTitle className="text-right text-foreground hover:text-primary transition-colors">
-                    {post.title}
-                  </CardTitle>
-                  <CardDescription className="text-right text-muted-foreground line-clamp-3">
-                    {post.description}
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 ml-1" />
-                      {formatDate(post.created_at)}
-                    </div>
-                    <div className="flex items-center">
-                      <User className="w-4 h-4 ml-1" />
-                      {post.profiles?.display_name || 'ادمین'}
-                    </div>
-                  </div>
-                  
-                  <p className="text-foreground/80 text-right leading-relaxed line-clamp-3">
-                    {post.content}
-                  </p>
-                  
-                  <Link to={`/posts/${post.id}`}>
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-primary/30 hover:border-primary hover:bg-primary/10"
-                    >
-                      مطالعه بیشتر
-                      <ArrowLeft className="mr-2 w-4 h-4" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Slide indicators */}
+            {posts.length > 3 && (
+              <div className="flex justify-center mt-8 gap-2">
+                {Array.from({ length: Math.max(1, posts.length - 2) }).map((_, index) => (
+                  <button
+                    key={index}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      index === currentSlide 
+                        ? 'bg-primary scale-125' 
+                        : 'bg-primary/30 hover:bg-primary/50'
+                    }`}
+                    onClick={() => setCurrentSlide(index)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
