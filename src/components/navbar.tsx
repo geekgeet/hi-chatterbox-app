@@ -53,8 +53,14 @@ export function Navbar() {
               onClick={() => scrollToSection("content")}
               className="text-foreground hover:text-primary transition-colors"
             >
-              اخبار
+              درباره ما
             </button>
+            <Link 
+              to="/posts"
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              اخبار
+            </Link>
             <button 
               onClick={() => scrollToSection("calculator")}
               className="text-foreground hover:text-primary transition-colors"
@@ -132,8 +138,15 @@ export function Navbar() {
                 onClick={() => scrollToSection("content")}
                 className="text-foreground hover:text-primary transition-colors py-2"
               >
-                اخبار
+                درباره ما
               </button>
+              <Link 
+                to="/posts"
+                className="text-foreground hover:text-primary transition-colors py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                اخبار
+              </Link>
               <button 
                 onClick={() => scrollToSection("calculator")}
                 className="text-foreground hover:text-primary transition-colors py-2"

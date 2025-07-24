@@ -26,9 +26,7 @@ interface Post {
   featured: boolean;
   image_url: string | null;
   created_at: string;
-  profiles: {
-    display_name: string | null;
-  } | null;
+  author_id: string;
 }
 
 export default function Posts() {
@@ -50,10 +48,7 @@ export default function Posts() {
     try {
       let query = supabase
         .from('posts')
-        .select(`
-          *,
-          profiles!posts_author_id_fkey(display_name)
-        `, { count: 'exact' })
+        .select('*', { count: 'exact' })
         .eq('published', true)
         .order('created_at', { ascending: false });
 
@@ -188,7 +183,7 @@ export default function Posts() {
                       </div>
                       <div className="flex items-center">
                         <User className="w-4 h-4 ml-1" />
-                        {post.profiles?.display_name || 'ادمین'}
+                        ادمین
                       </div>
                     </div>
                     
