@@ -35,7 +35,9 @@ import {
   Settings,
   FileText,
   Users,
-  ShoppingCart
+  ShoppingCart,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -69,6 +71,8 @@ export default function Admin() {
     featured: false,
     image_url: ''
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -135,6 +139,7 @@ export default function Admin() {
       image_url: ''
     });
     setEditingPost(null);
+    setSelectedFile(null);
   };
 
   const handleCreatePost = () => {
@@ -155,6 +160,39 @@ export default function Admin() {
     setShowPostDialog(true);
   };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      setUploadingImage(true);
+      
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `posts/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('post-images')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage
+        .from('post-images')
+        .getPublicUrl(filePath);
+
+      return data.publicUrl;
+    } catch (error: any) {
+      toast({
+        title: 'خطا در آپلود تصویر',
+        description: error.message,
+        variant: 'destructive'
+      });
+      return null;
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleSavePost = async () => {
     if (!formData.title.trim() || !formData.content.trim()) {
       toast({
@@ -166,13 +204,25 @@ export default function Admin() {
     }
 
     try {
+      let imageUrl = formData.image_url;
+      
+      // Upload new image if selected
+      if (selectedFile) {
+        const uploadedUrl = await uploadImage(selectedFile);
+        if (uploadedUrl) {
+          imageUrl = uploadedUrl;
+        } else {
+          return; // Stop if image upload failed
+        }
+      }
+
       const postData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         content: formData.content.trim(),
         published: formData.published,
         featured: formData.featured,
-        image_url: formData.image_url.trim() || null,
+        image_url: imageUrl.trim() || null,
         author_id: user?.id
       };
 
@@ -486,14 +536,67 @@ export default function Admin() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="image_url">لینک تصویر</Label>
-                <Input
-                  id="image_url"
-                  name="image_url"
-                  value={formData.image_url}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/image.jpg"
-                />
+                <Label htmlFor="image_url">تصویر مطلب</Label>
+                <div className="space-y-3">
+                  <Input
+                    id="image_url"
+                    name="image_url"
+                    value={formData.image_url}
+                    onChange={handleInputChange}
+                    placeholder="لینک تصویر (اختیاری)"
+                  />
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground mb-2">یا</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <label htmlFor="image-upload">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="cursor-pointer"
+                        disabled={uploadingImage}
+                        asChild
+                      >
+                        <span className="flex items-center gap-2">
+                          {uploadingImage ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                          ) : (
+                            <Upload className="w-4 h-4" />
+                          )}
+                          {selectedFile ? selectedFile.name : 'انتخاب تصویر'}
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
+                  
+                  {(formData.image_url || selectedFile) && (
+                    <div className="border rounded-lg p-2">
+                      <p className="text-sm text-muted-foreground mb-2 flex items-center gap-1">
+                        <ImageIcon className="w-4 h-4" />
+                        پیش‌نمایش تصویر:
+                      </p>
+                      {selectedFile ? (
+                        <img 
+                          src={URL.createObjectURL(selectedFile)} 
+                          alt="Preview" 
+                          className="w-full h-32 object-cover rounded"
+                        />
+                      ) : formData.image_url && (
+                        <img 
+                          src={formData.image_url} 
+                          alt="Preview" 
+                          className="w-full h-32 object-cover rounded"
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
