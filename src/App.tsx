@@ -9,6 +9,9 @@ import Auth from "./pages/Auth";
 import Posts from "./pages/Posts";
 import PostDetail from "./pages/PostDetail";
 import Admin from "./pages/Admin";
+import PaymentCallback from "./pages/PaymentCallback";
+// import UserPayments from "./pages/UserPayments"; // Remove direct import as it's now part of UserPanel
+import UserPanel from "./pages/UserPanel"; // Import the new UserPanel component
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +29,9 @@ const App = () => (
             <Route path="/posts" element={<Posts />} />
             <Route path="/posts/:id" element={<PostDetail />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/payment-callback" element={<PaymentCallback />} />
+            {/* Removed: <Route path="/user/payments" element={<UserPayments />} /> */}
+            <Route path="/user-panel" element={<UserPanel />} /> {/* New User Panel route */}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

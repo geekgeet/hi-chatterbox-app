@@ -58,18 +58,21 @@ export function ContentSection() {
     }).format(date);
   };
 
+  // For showing 3 posts at a time, calculate how many slides we need
+  const maxSlides = Math.max(1, posts.length - 2);
+  
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % Math.max(1, posts.length - 2));
+    setCurrentSlide((prev) => (prev + 1) % maxSlides);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + Math.max(1, posts.length - 2)) % Math.max(1, posts.length - 2));
+    setCurrentSlide((prev) => (prev - 1 + maxSlides) % maxSlides);
   };
   return (
     <section className="py-16 bg-gradient-energy">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-solar bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold py-4 mb-4 bg-gradient-solar bg-clip-text text-transparent">
             اخبار و مطالب
           </h2>
           <p className="text-xl text-muted-foreground">
@@ -133,8 +136,8 @@ export function ContentSection() {
               <div 
                 className="flex transition-transform duration-500 ease-in-out"
                 style={{ 
-                  transform: `translateX(${currentSlide * (100 / 3)}%)`,
-                  width: `${(posts.length / 3) * 100}%`
+                  transform: `translateX(-${currentSlide * (100 / posts.length)}%)`,
+                  width: `${posts.length * (100 / 3)}%`
                 }}
               >
                 {posts.map((post) => (
@@ -194,7 +197,7 @@ export function ContentSection() {
             {/* Slide indicators */}
             {posts.length > 3 && (
               <div className="flex justify-center mt-8 gap-2">
-                {Array.from({ length: Math.max(1, posts.length - 2) }).map((_, index) => (
+                {Array.from({ length: maxSlides }).map((_, index) => (
                   <button
                     key={index}
                     className={`w-3 h-3 rounded-full transition-all duration-300 ${

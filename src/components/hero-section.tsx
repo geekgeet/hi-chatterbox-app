@@ -24,14 +24,13 @@ export function HeroSection() {
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
         <div className="flex items-center justify-center mb-6">
           <Sun className="w-16 h-16 text-primary animate-solar-glow ml-4" />
-          <Zap className="w-12 h-12 text-secondary animate-energy-pulse" />
         </div>
         
-        <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-solar bg-clip-text text-transparent animate-solar-glow">
+        <h1 className="text-6xl md:text-8xl font-bold py-8 bg-gradient-solar bg-clip-text text-transparent animate-solar-glow">
           خورشید زرین کیان
         </h1>
         
-        <p className="text-xl md:text-2xl text-foreground/90 mb-8 leading-relaxed">
+        <p className="text-xl md:text-2xl text-foreground/90 py-8 leading-relaxed">
           آینده انرژی پاک و تجدیدپذیر
           <br />
           تولید برق خورشیدی با جدیدترین تکنولوژی‌های دنیا
@@ -39,11 +38,14 @@ export function HeroSection() {
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button 
+            asChild
             size="lg" 
             className="bg-gradient-solar hover:scale-105 transition-all duration-300 animate-energy-pulse text-lg px-8 py-4"
           >
-            محاسبه قیمت برق
-            <Zap className="mr-2 w-5 h-5" />
+            <a href="#calculator" className="flex items-center">
+              محاسبه قیمت برق
+              <Zap className="mr-2 w-5 h-5" />
+            </a>
           </Button>
           
           <Button 
@@ -51,7 +53,10 @@ export function HeroSection() {
             size="lg"
             className="border-primary/50 text-foreground hover:border-primary hover:bg-primary/10 text-lg px-8 py-4"
           >
+
+          <a href="#contact" className="flex items-center">
             درباره نیروگاه
+          </a>  
           </Button>
         </div>
       </div>

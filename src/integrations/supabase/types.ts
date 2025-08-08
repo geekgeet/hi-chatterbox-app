@@ -47,6 +47,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_comments_user_profiles"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       electricity_packages: {
@@ -82,6 +89,48 @@ export type Database = {
           name?: string
           price?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          authority: string | null
+          created_at: string
+          description: string
+          email: string | null
+          id: string
+          mobile: string | null
+          ref_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          authority?: string | null
+          created_at?: string
+          description: string
+          email?: string | null
+          id?: string
+          mobile?: string | null
+          ref_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          authority?: string | null
+          created_at?: string
+          description?: string
+          email?: string | null
+          id?: string
+          mobile?: string | null
+          ref_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

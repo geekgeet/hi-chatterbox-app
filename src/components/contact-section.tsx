@@ -33,10 +33,10 @@ export function ContactSection() {
   }
 
   return (
-    <section className="py-16 bg-background">
+    <section className="py-16 bg-background" dir="rtl">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-solar bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold py-4 mb-4 bg-gradient-solar bg-clip-text text-transparent">
             تماس با ما
           </h2>
           <p className="text-xl text-muted-foreground">
@@ -128,7 +128,7 @@ export function ContactSection() {
                   </div>
                   <div className="text-right">
                     <h3 className="font-semibold text-foreground">تلفن</h3>
-                    <p className="text-muted-foreground">021-12345678</p>
+                    <p className="text-muted-foreground">071-91002181</p>
                   </div>
                 </div>
               </CardContent>
@@ -142,7 +142,7 @@ export function ContactSection() {
                   </div>
                   <div className="text-right">
                     <h3 className="font-semibold text-foreground">ایمیل</h3>
-                    <p className="text-muted-foreground">info@khorshid-zarin.ir</p>
+                    <p className="text-muted-foreground">info@khzki.com</p>
                   </div>
                 </div>
               </CardContent>
@@ -157,20 +157,36 @@ export function ContactSection() {
                   <div className="text-right">
                     <h3 className="font-semibold text-foreground">آدرس</h3>
                     <p className="text-muted-foreground">
-                      تهران، منطقه صنعتی، کیلومتر 15 جاده ساوه
+                    شهرک صنعتی بزرگ شیراز، بلوار پژوهش شمالی، خیابان ۲۶۰
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-solar p-6 text-background">
-              <h3 className="text-xl font-bold mb-4">ساعات کاری</h3>
-              <div className="space-y-2 text-right">
-                <p>شنبه تا چهارشنبه: 8:00 - 17:00</p>
-                <p>پنج‌شنبه: 8:00 - 13:00</p>
-                <p>جمعه: تعطیل</p>
-              </div>
+            {/* Google Map */}
+            <Card className="bg-card/80 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-all duration-300 overflow-hidden">
+                <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d4063.31003121489!2d52.53511907607867!3d30.844931580200694!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMzDCsDUwJzQxLjciTiA1MsKwMzInMTUuNyJF!5e1!3m2!1sen!2sus!4v1754218384197!5m2!1sen!2sus" 
+                width="100%" 
+                height="250" 
+                style={{border:0}} 
+                allowFullScreen={true}
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+            </Card>
+
+            {/* ساعات کاری */}
+            <Card className="bg-card/80 backdrop-blur-sm border-primary/20 hover:border-primary/50 transition-all duration-300">
+                <CardContent className="p-4 text-right">
+                    <h3 className="font-semibold text-foreground mb-2 text-md">ساعات کاری</h3>
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                    <p>شنبه تا چهارشنبه: ۸:۰۰ - ۱۷:۰۰</p>
+                    <p>پنج‌شنبه: ۸:۰۰ - ۱۳:۰۰</p>
+                    <p>جمعه: تعطیل</p>
+                    </div>
+                </CardContent>
             </Card>
           </div>
         </div>

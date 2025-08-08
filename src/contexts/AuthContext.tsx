@@ -22,42 +22,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Check if user is admin
-          setTimeout(async () => {
-            try {
-              const { data: roles } = await supabase
-                .from('user_roles')
-                .select('role')
-                .eq('user_id', session.user.id)
-                .eq('role', 'admin')
-                .single();
-              
-              setIsAdmin(!!roles);
-            } catch (error) {
-              setIsAdmin(false);
-            }
-          }, 0);
-        } else {
-          setIsAdmin(false);
-        }
-        
-        setLoading(false);
-      }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const updateUserStatus = async (session: Session | null) => {
       setSession(session);
       setUser(session?.user ?? null);
+
+      if (session?.user) {
+        try {
+          const { data: roles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .eq('role', 'admin')
+            .single();
+          setIsAdmin(!!roles);
+        } catch (error) {
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
       setLoading(false);
+    };
+
+    // Initial check on page load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      updateUserStatus(session);
     });
+
+    // Set up auth state listener for real-time changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        updateUserStatus(session);
+      }
+    );
 
     return () => subscription.unsubscribe();
   }, []);
@@ -115,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         resetPassword
       }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }

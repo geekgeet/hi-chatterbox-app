@@ -7,9 +7,9 @@ export function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* لوگو و توضیحات */}
           <div className="text-right">
-            <div className="flex items-center space-x-3 space-x-reverse mb-4">
+            <div className="flex items-center flex-row-reverse space-x-3 space-x-reverse mb-4">
               <Sun className="w-8 h-8 text-primary animate-solar-glow" />
-              <span className="text-xl font-bold bg-gradient-solar bg-clip-text text-transparent">
+              <span className="text-xl font-bold  bg-gradient-solar bg-clip-text text-transparent">
                 خورشید زرین کیان
               </span>
             </div>
@@ -66,26 +66,25 @@ export function Footer() {
             <h3 className="text-lg font-semibold text-foreground mb-4">
               اطلاعات تماس
             </h3>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 space-x-reverse">
+            <div className="space-y-3 text-right">
+              <div className="flex items-center flex-row-reverse space-x-3 space-x-reverse">
                 <Phone className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">021-12345678</span>
+                <span className="text-muted-foreground ">071-91002181</span>
               </div>
-              <div className="flex items-center space-x-3 space-x-reverse">
+              <div className="flex items-center flex-row-reverse space-x-3 space-x-reverse">
                 <Mail className="w-4 h-4 text-secondary" />
-                <span className="text-muted-foreground">info@khorshid-zarin.ir</span>
+                <span className="text-muted-foreground">info@khzki.com</span>
               </div>
-              <div className="flex items-center space-x-3 space-x-reverse">
+              <div className="flex items-center flex-row-reverse space-x-3 space-x-reverse">
                 <MapPin className="w-4 h-4 text-energy" />
-                <span className="text-muted-foreground">تهران، جاده ساوه</span>
+                <span className="text-muted-foreground"> شهرک صنعتی بزرگ شیراز، بلوار پژوهش شمالی، خیابان ۲۶۰</span>
               </div>
             </div>
           </div>
         </div>
-
         <div className="border-t border-primary/20 mt-8 pt-8 text-center">
           <p className="text-muted-foreground">
-            © 1403 خورشید زرین کیان. تمامی حقوق محفوظ است.
+            © 1404 تمامی حقوق محفوظ است
           </p>
         </div>
       </div>

@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Navbar } from '@/components/navbar'; // Import Navbar
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -137,8 +138,9 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-energy px-4">
-      <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm border-primary/20">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-energy px-4">
+      <Navbar /> {/* Add Navbar here */}
+      <Card className="w-full max-w-md bg-card/90 backdrop-blur-sm border-primary/20 mt-16">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-2xl font-bold bg-gradient-solar bg-clip-text text-transparent">
             خورشید زرین کیان

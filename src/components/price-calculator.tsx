@@ -6,12 +6,16 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calculator, Zap, CreditCard } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/contexts/AuthContext"
+import { supabase } from "@/integrations/supabase/client"
 
 export function PriceCalculator() {
   const [consumption, setConsumption] = useState("")
   const [customerType, setCustomerType] = useState("")
   const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null)
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
   const { toast } = useToast()
+  const { user } = useAuth()
 
   const calculatePrice = () => {
     if (!consumption || !customerType) {
@@ -45,25 +49,82 @@ export function PriceCalculator() {
     setCalculatedPrice(totalPrice)
   }
 
-  const handlePayment = () => {
-    if (!calculatedPrice) return
-    
-    toast({
-      title: "انتقال به درگاه پرداخت",
-      description: "در حال انتقال به صفحه پرداخت امن...",
-    })
-    
-    // اینجا می‌توان به درگاه پرداخت واقعی متصل شد
-    setTimeout(() => {
-      window.open("#payment", "_blank")
-    }, 1000)
+  const handlePayment = async () => {
+    if (!user) {
+      toast({
+        title: "خطا",
+        description: "برای پرداخت باید وارد حساب کاربری شوید",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!calculatedPrice) {
+      toast({
+        title: "خطا", 
+        description: "ابتدا مبلغ را محاسبه کنید",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setIsProcessingPayment(true)
+
+    try {
+      // Convert Rials to Tomans for ZarinPal (divide by 10)
+      const amountInTomans = Math.round(calculatedPrice / 10);
+      
+      const { data, error } = await supabase.functions.invoke('create-zarinpal-payment', {
+        body: {
+          amount: amountInTomans,
+          description: `پرداخت قبض برق - ${customerType === "residential" ? "خانگی" : customerType === "commercial" ? "تجاری" : "صنعتی"} - ${consumption} کیلووات ساعت`,
+          mobile: "", // Could add mobile input field
+          email: user.email
+        }
+      });
+
+      if (error) {
+        console.error('Payment error:', error)
+        toast({
+          title: "خطا در پرداخت",
+          description: "مشکلی در ایجاد درخواست پرداخت رخ داد",
+          variant: "destructive"
+        })
+        return
+      }
+
+      if (data.success && data.paymentUrl) {
+        toast({
+          title: "هدایت به درگاه پرداخت",
+          description: "در حال انتقال به درگاه زرین‌پال...",
+        })
+        
+        // Redirect to ZarinPal payment gateway
+        window.location.href = data.paymentUrl;
+      } else {
+        toast({
+          title: "خطا در پرداخت",
+          description: data.error || "مشکلی در ایجاد درخواست پرداخت رخ داد",
+          variant: "destructive"
+        })
+      }
+    } catch (error) {
+      console.error('Payment error:', error)
+      toast({
+        title: "خطا در پرداخت",
+        description: "مشکلی در ارتباط با سرور رخ داد",
+        variant: "destructive"
+      })
+    } finally {
+      setIsProcessingPayment(false)
+    }
   }
 
   return (
     <section className="py-16 bg-gradient-energy">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-solar bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold py-4 mb-4 bg-gradient-solar bg-clip-text text-transparent">
             محاسبه‌گر قیمت برق
           </h2>
           <p className="text-xl text-muted-foreground">
@@ -153,9 +214,10 @@ export function PriceCalculator() {
 
                     <Button 
                       onClick={handlePayment}
-                      className="w-full bg-energy hover:bg-energy/90 text-energy-foreground hover:scale-105 transition-all duration-300"
+                      disabled={isProcessingPayment || !user}
+                      className="w-full bg-energy hover:bg-energy/90 text-energy-foreground hover:scale-105 transition-all duration-300 disabled:opacity-50"
                     >
-                      پرداخت آنلاین
+                      {isProcessingPayment ? "در حال پردازش..." : !user ? "ابتدا وارد شوید" : "پرداخت آنلاین"}
                       <CreditCard className="mr-2 w-4 h-4" />
                     </Button>
                   </>

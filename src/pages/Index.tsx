@@ -6,6 +6,7 @@ import { ContentSection } from "@/components/content-section"
 import { PriceCalculator } from "@/components/price-calculator"
 import { ContactSection } from "@/components/contact-section"
 import { Footer } from "@/components/footer"
+import ProjectProgress from "@/components/project-progress"
 
 const Index = () => {
   useEffect(() => {
@@ -28,6 +29,10 @@ const Index = () => {
         
         <section id="content">
           <ContentSection />
+        </section>
+        
+        <section id="progress">
+          <ProjectProgress />
         </section>
         
         <section id="calculator">

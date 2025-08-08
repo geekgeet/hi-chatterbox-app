@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
+import { CommentsSection } from '@/components/comments-section';
 
 interface Post {
   id: string;
@@ -19,9 +20,6 @@ interface Post {
   image_url: string | null;
   created_at: string;
   updated_at: string;
-  profiles: {
-    display_name: string | null;
-  } | null;
 }
 
 export default function PostDetail() {
@@ -44,13 +42,10 @@ export default function PostDetail() {
     try {
       const { data, error } = await supabase
         .from('posts')
-        .select(`
-          *,
-          profiles!posts_author_id_fkey(display_name)
-        `)
+        .select('*')
         .eq('id', id)
         .eq('published', true)
-        .single();
+        .maybeSingle();
 
       if (error) {
         toast({
@@ -187,7 +182,7 @@ export default function PostDetail() {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center">
                     <User className="w-4 h-4 ml-1" />
-                    <span>{post.profiles?.display_name || 'مدیر سایت'}</span>
+                    <span>مدیر سایت</span>
                   </div>
                   <div className="flex items-center">
                     <Calendar className="w-4 h-4 ml-1" />
@@ -245,6 +240,9 @@ export default function PostDetail() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Comments Section */}
+          <CommentsSection postId={post.id} />
         </div>
       </div>
       
