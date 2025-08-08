@@ -113,24 +113,25 @@ export function AdminComments() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MessageCircle className="w-5 h-5" />
+    <Card className="border-0 bg-card/50 backdrop-blur-sm shadow-lg">
+      <CardHeader className="bg-gradient-to-r from-secondary/5 to-transparent p-8 rounded-t-lg">
+        <CardTitle className="text-2xl text-secondary flex items-center gap-3">
+          <MessageCircle className="w-6 h-6" />
           مدیریت کامنت‌ها ({comments.length})
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="p-8">
+        <div className="space-y-6">
           {comments.length === 0 ? (
-            <div className="text-center p-6 text-muted-foreground">
-              هیچ کامنتی یافت نشد
+            <div className="text-center p-12 bg-gradient-to-r from-muted/20 to-transparent rounded-lg border border-border/50">
+              <MessageCircle className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+              <p className="text-muted-foreground text-lg">هیچ کامنتی یافت نشد</p>
             </div>
           ) : (
             comments.map((comment) => (
               <div
                 key={comment.id}
-                className="p-4 border border-border rounded-lg bg-background/50 space-y-3"
+                className="p-6 border border-border/50 rounded-xl bg-gradient-to-r from-background/80 to-card/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 space-y-4"
               >
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">

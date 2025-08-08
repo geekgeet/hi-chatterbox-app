@@ -358,53 +358,121 @@ export default function Admin() {
   // Render content only if user is an admin after loading is complete
   if (user && isAdmin) {
     return (
-      <div className="min-h-screen bg-gradient-energy">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
         <Navbar />
-        <div className="container mx-auto px-4 pt-24 pb-8"> {/* Adjusted padding here */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-solar bg-clip-text text-transparent mb-2">
-              پنل مدیریت
-            </h1>
-            <p className="text-muted-foreground">
-              مدیریت محتوا و تنظیمات وبسایت خورشید زرین کیان
-            </p>
+        <div className="container mx-auto px-6 pt-24 pb-12">
+          {/* Header Section */}
+          <div className="mb-10">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="p-3 rounded-xl bg-gradient-solar">
+                <Settings className="w-8 h-8 text-black" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-solar bg-clip-text text-transparent">
+                  پنل مدیریت
+                </h1>
+                <p className="text-muted-foreground text-lg mt-1">
+                  مدیریت محتوا و تنظیمات وبسایت خورشید زرین کیان
+                </p>
+              </div>
+            </div>
+            
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+              <Card className="border-0 bg-gradient-to-br from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10 transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">مطالب</p>
+                      <p className="text-2xl font-bold text-primary">{posts.length}</p>
+                    </div>
+                    <FileText className="w-8 h-8 text-primary/60" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-0 bg-gradient-to-br from-secondary/10 to-secondary/5 hover:from-secondary/20 hover:to-secondary/10 transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">کامنت‌ها</p>
+                      <p className="text-2xl font-bold text-secondary">{comments.length}</p>
+                    </div>
+                    <Plus className="w-8 h-8 text-secondary/60" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-0 bg-gradient-to-br from-energy/10 to-energy/5 hover:from-energy/20 hover:to-energy/10 transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">کاربران</p>
+                      <p className="text-2xl font-bold text-energy">0</p>
+                    </div>
+                    <Users className="w-8 h-8 text-energy/60" />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-0 bg-gradient-to-br from-accent/10 to-accent/5 hover:from-accent/20 hover:to-accent/10 transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">سفارشات</p>
+                      <p className="text-2xl font-bold text-accent">0</p>
+                    </div>
+                    <ShoppingCart className="w-8 h-8 text-accent/60" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
-          <Tabs defaultValue="posts" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="posts" className="flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                مطالب
-              </TabsTrigger>
-              <TabsTrigger value="comments" className="flex items-center gap-2">
-                <Plus className="w-4 h-4" />
-                کامنت‌ها
-              </TabsTrigger>
-              <TabsTrigger value="users" className="flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                کاربران
-              </TabsTrigger>
-              <TabsTrigger value="orders" className="flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4" />
-                سفارشات
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-2">
-                <Settings className="w-4 h-4" />
-                تنظیمات
-              </TabsTrigger>
-            </TabsList>
+          <Tabs defaultValue="posts" className="space-y-8">
+            <div className="flex items-center justify-center">
+              <TabsList className="grid grid-cols-5 w-fit bg-card/50 backdrop-blur-sm border border-border/50 shadow-lg p-1 rounded-xl">
+                <TabsTrigger value="posts" className="flex items-center gap-2 px-6 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300">
+                  <FileText className="w-4 h-4" />
+                  مطالب
+                </TabsTrigger>
+                <TabsTrigger value="comments" className="flex items-center gap-2 px-6 py-3 data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground transition-all duration-300">
+                  <Plus className="w-4 h-4" />
+                  کامنت‌ها
+                </TabsTrigger>
+                <TabsTrigger value="users" className="flex items-center gap-2 px-6 py-3 data-[state=active]:bg-energy data-[state=active]:text-energy-foreground transition-all duration-300">
+                  <Users className="w-4 h-4" />
+                  کاربران
+                </TabsTrigger>
+                <TabsTrigger value="orders" className="flex items-center gap-2 px-6 py-3 data-[state=active]:bg-accent data-[state=active]:text-accent-foreground transition-all duration-300">
+                  <ShoppingCart className="w-4 h-4" />
+                  سفارشات
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="flex items-center gap-2 px-6 py-3 data-[state=active]:bg-muted data-[state=active]:text-muted-foreground transition-all duration-300">
+                  <Settings className="w-4 h-4" />
+                  تنظیمات
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-            <TabsContent value="posts" className="space-y-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle>مدیریت مطالب</CardTitle>
-                    <CardDescription>
+            <TabsContent value="posts" className="space-y-8">
+              <Card className="border-0 bg-card/50 backdrop-blur-sm shadow-lg">
+                <CardHeader className="flex flex-row items-center justify-between bg-gradient-to-r from-primary/5 to-transparent p-8 rounded-t-lg">
+                  <div className="space-y-2">
+                    <CardTitle className="text-2xl text-primary flex items-center gap-3">
+                      <FileText className="w-6 h-6" />
+                      مدیریت مطالب
+                    </CardTitle>
+                    <CardDescription className="text-base">
                       ایجاد، ویرایش و حذف مطالب وبسایت
                     </CardDescription>
                   </div>
-                  <Button onClick={handleCreatePost} className="bg-gradient-solar">
-                    <Plus className="w-4 h-4 ml-2" />
+                  <Button 
+                    onClick={handleCreatePost} 
+                    className="bg-gradient-solar hover:shadow-energy transition-all duration-300 px-6 py-3 text-lg"
+                    size="lg"
+                  >
+                    <Plus className="w-5 h-5 ml-2" />
                     مطلب جدید
                   </Button>
                 </CardHeader>
@@ -488,50 +556,130 @@ export default function Admin() {
               <AdminComments />
             </TabsContent>
 
-            <TabsContent value="users">
-              <Card>
-                <CardHeader>
-                  <CardTitle>مدیریت کاربران</CardTitle>
-                  <CardDescription>مشاهده و مدیریت کاربران سیستم</CardDescription>
+            <TabsContent value="users" className="space-y-8">
+              <Card className="border-0 bg-card/50 backdrop-blur-sm shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-energy/5 to-transparent p-8 rounded-t-lg">
+                  <CardTitle className="text-2xl text-energy flex items-center gap-3">
+                    <Users className="w-6 h-6" />
+                    مدیریت کاربران
+                  </CardTitle>
+                  <CardDescription className="text-base mt-2">
+                    مشاهده و مدیریت کاربران سیستم
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Alert>
-                    <AlertDescription>
-                      این بخش در نسخه بعدی پیاده‌سازی خواهد شد
-                    </AlertDescription>
-                  </Alert>
+                <CardContent className="p-8">
+                  <div className="text-center p-12 bg-gradient-to-r from-muted/20 to-transparent rounded-lg border border-border/50">
+                    <Users className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+                    <p className="text-muted-foreground text-lg mb-2">بخش مدیریت کاربران</p>
+                    <p className="text-sm text-muted-foreground">این بخش در نسخه بعدی پیاده‌سازی خواهد شد</p>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="orders">
-              <Card>
-                <CardHeader>
-                  <CardTitle>مدیریت سفارشات</CardTitle>
-                  <CardDescription>مشاهده و مدیریت سفارشات برق</CardDescription>
+            <TabsContent value="orders" className="space-y-8">
+              <Card className="border-0 bg-card/50 backdrop-blur-sm shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-accent/5 to-transparent p-8 rounded-t-lg">
+                  <CardTitle className="text-2xl text-accent flex items-center gap-3">
+                    <ShoppingCart className="w-6 h-6" />
+                    مدیریت سفارشات
+                  </CardTitle>
+                  <CardDescription className="text-base mt-2">
+                    مشاهده و مدیریت سفارشات انرژی خورشیدی
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Alert>
-                    <AlertDescription>
-                      این بخش در نسخه بعدی پیاده‌سازی خواهد شد
-                    </AlertDescription>
-                  </Alert>
+                <CardContent className="p-8">
+                  <div className="text-center p-12 bg-gradient-to-r from-muted/20 to-transparent rounded-lg border border-border/50">
+                    <ShoppingCart className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+                    <p className="text-muted-foreground text-lg mb-2">بخش مدیریت سفارشات</p>
+                    <p className="text-sm text-muted-foreground">این بخش در نسخه بعدی پیاده‌سازی خواهد شد</p>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="settings">
-              <Card>
-                <CardHeader>
-                  <CardTitle>تنظیمات سیستم</CardTitle>
-                  <CardDescription>تنظیمات عمومی وبسایت</CardDescription>
+            <TabsContent value="settings" className="space-y-8">
+              <Card className="border-0 bg-card/50 backdrop-blur-sm shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-muted/10 to-transparent p-8 rounded-t-lg">
+                  <CardTitle className="text-2xl flex items-center gap-3">
+                    <Settings className="w-6 h-6" />
+                    تنظیمات سیستم
+                  </CardTitle>
+                  <CardDescription className="text-base mt-2">
+                    تنظیمات عمومی وبسایت و سیستم
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <Alert>
-                    <AlertDescription>
-                      این بخش در نسخه بعدی پیاده‌سازی خواهد شد
-                    </AlertDescription>
-                  </Alert>
+                <CardContent className="p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="p-6 rounded-lg bg-gradient-to-r from-primary/10 to-transparent border border-border/50">
+                      <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                        <Settings className="w-5 h-5" />
+                        تنظیمات عمومی
+                      </h3>
+                      <div className="space-y-3 text-muted-foreground text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-primary"></div>
+                          <span>تنظیمات SEO</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-primary"></div>
+                          <span>مدیریت متا تگ‌ها</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-primary"></div>
+                          <span>تنظیمات اجتماعی</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6 rounded-lg bg-gradient-to-r from-secondary/10 to-transparent border border-border/50">
+                      <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                        <Eye className="w-5 h-5" />
+                        ظاهر وبسایت
+                      </h3>
+                      <div className="space-y-3 text-muted-foreground text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-secondary"></div>
+                          <span>مدیریت رنگ‌ها</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-secondary"></div>
+                          <span>تنظیمات فونت</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-secondary"></div>
+                          <span>لوگو و تصاویر</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6 rounded-lg bg-gradient-to-r from-energy/10 to-transparent border border-border/50">
+                      <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                        <FileText className="w-5 h-5" />
+                        تنظیمات محتوا
+                      </h3>
+                      <div className="space-y-3 text-muted-foreground text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-energy"></div>
+                          <span>مدیریت دسته‌بندی‌ها</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-energy"></div>
+                          <span>تنظیمات کامنت</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-energy"></div>
+                          <span>مدیریت فایل</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-8 p-6 rounded-lg bg-gradient-to-r from-muted/20 to-transparent border border-border/30">
+                    <p className="text-center text-muted-foreground">
+                      این تنظیمات در نسخه‌های آینده پیاده‌سازی خواهند شد.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
