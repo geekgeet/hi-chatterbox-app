@@ -36,6 +36,18 @@ serve(async (req) => {
       throw new Error("Amount and description are required");
     }
 
+    // Get user profile to get mobile number if not provided
+    let userMobile = mobile;
+    if (!userMobile) {
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('phone')
+        .eq('user_id', user.id)
+        .single();
+      
+      userMobile = profile?.phone || "09123456789"; // Default mobile if not available
+    }
+
     // Get ZarinPal merchant ID from environment
     const merchantId = "2e1396c3-6ac2-4c29-94f6-370d7400fd0f"; //Deno.env.get("ZARINPAL_MERCHANT_ID");
     if (!merchantId) {
@@ -52,7 +64,7 @@ serve(async (req) => {
       description: description,
       callback_url: callbackUrl,
       metadata: {
-        mobile: mobile || "",
+        mobile: userMobile,
         email: email || user.email || ""
       }
     };
@@ -72,7 +84,18 @@ serve(async (req) => {
     console.log("ZarinPal response:", zarinpalResult);
 
     if (zarinpalResult.data?.code !== 100) {
-      throw new Error(`ZarinPal error: ${zarinpalResult.errors?.join(", ") || "Unknown error"}`);
+      // Handle different error structures from ZarinPal
+      let errorMessage = "Unknown error";
+      if (zarinpalResult.errors) {
+        if (typeof zarinpalResult.errors === 'string') {
+          errorMessage = zarinpalResult.errors;
+        } else if (zarinpalResult.errors.message) {
+          errorMessage = zarinpalResult.errors.message;
+        } else if (Array.isArray(zarinpalResult.errors)) {
+          errorMessage = zarinpalResult.errors.join(", ");
+        }
+      }
+      throw new Error(`ZarinPal error: ${errorMessage}`);
     }
 
     const authority = zarinpalResult.data.authority;
@@ -90,7 +113,7 @@ serve(async (req) => {
       description: description,
       authority: authority,
       status: "pending",
-      mobile: mobile,
+      mobile: userMobile,
       email: email || user.email,
     });
 
