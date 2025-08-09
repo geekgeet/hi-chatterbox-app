@@ -269,7 +269,6 @@ export default function Admin() {
         .from('purchases')
         .select(`
           *,
-          profiles(display_name),
           electricity_packages(name)
         `)
         .order('created_at', { ascending: false });
