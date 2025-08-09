@@ -119,6 +119,19 @@ interface Purchase {
   };
 }
 
+interface Payment {
+  id: string;
+  user_id: string;
+  amount: number;
+  status: string;
+  description: string;
+  ref_id: string | null;
+  created_at: string;
+  profiles?: {
+    display_name: string | null;
+  };
+}
+
 export default function Admin() {
   const navigate = useNavigate();
   const { user, isAdmin, loading } = useAuth();
@@ -128,11 +141,13 @@ export default function Admin() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   
   const [postsLoading, setPostsLoading] = useState(true);
   const [commentsLoading, setCommentsLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
   const [purchasesLoading, setPurchasesLoading] = useState(true);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
   
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
@@ -175,7 +190,8 @@ export default function Admin() {
       fetchPosts(),
       fetchComments(),
       fetchUsers(),
-      fetchPurchases()
+      fetchPurchases(),
+      fetchPayments()
     ]);
   };
 
@@ -251,7 +267,11 @@ export default function Admin() {
     try {
       const { data, error } = await supabase
         .from('purchases')
-        .select('*')
+        .select(`
+          *,
+          profiles(display_name),
+          electricity_packages(name)
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -264,6 +284,30 @@ export default function Admin() {
       });
     } finally {
       setPurchasesLoading(false);
+    }
+  };
+
+  const fetchPayments = async () => {
+    setPaymentsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('payments')
+        .select(`
+          *,
+          profiles(display_name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPayments(data || []);
+    } catch (error: any) {
+      toast({
+        title: 'خطا در بارگذاری تراکنش‌ها',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setPaymentsLoading(false);
     }
   };
 
