@@ -109,11 +109,30 @@ serve(async (req) => {
 
     let paymentStatus = "failed";
     let refId = null;
+    let message = "پرداخت ناموفق بود";
 
-    if (zarinpalResult.data?.code === 100 || zarinpalResult.data?.code === 101) {
-      // Payment successful (100 = new success, 101 = already verified)
+    console.log("ZarinPal verification result code:", zarinpalResult.data?.code);
+
+    if (zarinpalResult.data?.code === 100) {
+      // Payment successful - new verification
       paymentStatus = "success";
       refId = zarinpalResult.data.ref_id;
+      message = "پرداخت با موفقیت انجام شد";
+    } else if (zarinpalResult.data?.code === 101) {
+      // Payment already verified before
+      paymentStatus = "success";
+      refId = zarinpalResult.data.ref_id;
+      message = "پرداخت قبلاً تأیید شده بود";
+    } else {
+      // Payment failed - log the specific error
+      console.log("Payment verification failed. Response:", zarinpalResult);
+      if (zarinpalResult.errors) {
+        if (typeof zarinpalResult.errors === 'string') {
+          message = `خطا در پرداخت: ${zarinpalResult.errors}`;
+        } else if (zarinpalResult.errors.message) {
+          message = `خطا در پرداخت: ${zarinpalResult.errors.message}`;
+        }
+      }
     }
 
     // Update payment record in database
@@ -137,9 +156,7 @@ serve(async (req) => {
         ref_id: refId,
         amount: payment.amount,
         description: payment.description,
-        message: paymentStatus === "success" 
-          ? "پرداخت با موفقیت انجام شد" 
-          : "پرداخت ناموفق بود"
+        message: message
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

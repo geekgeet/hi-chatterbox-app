@@ -25,6 +25,8 @@ import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface UserPayment {
   id: string;
@@ -59,6 +61,12 @@ export default function UserPanel() {
   const [purchases, setPurchases] = useState<UserPurchase[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(true);
   const [purchasesLoading, setPurchasesLoading] = useState(true);
+  const [profileData, setProfileData] = useState({
+    display_name: '',
+    phone: ''
+  });
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileEditing, setProfileEditing] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -75,8 +83,65 @@ export default function UserPanel() {
   const fetchUserData = async () => {
     await Promise.all([
       fetchPayments(),
-      fetchPurchases()
+      fetchPurchases(),
+      fetchProfile()
     ]);
+  };
+
+  const fetchProfile = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('display_name, phone')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      
+      if (data) {
+        setProfileData({
+          display_name: data.display_name || '',
+          phone: data.phone || ''
+        });
+      }
+    } catch (error: any) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const updateProfile = async () => {
+    if (!user) return;
+    
+    setProfileLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          user_id: user.id,
+          display_name: profileData.display_name,
+          phone: profileData.phone,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: 'پروفایل بروزرسانی شد',
+        description: 'اطلاعات شما با موفقیت ذخیره شد'
+      });
+      
+      setProfileEditing(false);
+    } catch (error: any) {
+      toast({
+        title: 'خطا در بروزرسانی پروفایل',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setProfileLoading(false);
+    }
   };
 
   const fetchPayments = async () => {
@@ -519,33 +584,100 @@ export default function UserPanel() {
               
               <CardContent className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Account Information */}
+                  {/* Profile Information Form */}
                   <div className="space-y-6">
                     <div className="p-6 rounded-xl bg-gradient-to-r from-accent/10 to-transparent border border-accent/20">
                       <h3 className="font-semibold text-lg mb-4 flex items-center gap-3">
                         <User className="w-5 h-5 text-accent" />
-                        اطلاعات حساب
+                        اطلاعات پروفایل
                       </h3>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">ایمیل:</span>
-                          <span className="font-medium">{user?.email}</span>
+                      
+                      {profileEditing ? (
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="display_name">نام نمایشی</Label>
+                            <Input
+                              id="display_name"
+                              value={profileData.display_name}
+                              onChange={(e) => setProfileData(prev => ({ ...prev, display_name: e.target.value }))}
+                              placeholder="نام نمایشی خود را وارد کنید"
+                              className="mt-2"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="phone">شماره موبایل</Label>
+                            <Input
+                              id="phone"
+                              value={profileData.phone}
+                              onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
+                              placeholder="09123456789"
+                              className="mt-2"
+                              dir="ltr"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="email">ایمیل</Label>
+                            <Input
+                              id="email"
+                              value={user?.email || ''}
+                              disabled
+                              className="mt-2 opacity-60"
+                              placeholder="ایمیل قابل تغییر نیست"
+                            />
+                          </div>
+                          <div className="flex gap-2 pt-4">
+                            <Button 
+                              onClick={updateProfile} 
+                              disabled={profileLoading}
+                              className="flex-1 bg-gradient-to-r from-accent to-accent-glow"
+                            >
+                              {profileLoading ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              onClick={() => {
+                                setProfileEditing(false);
+                                fetchProfile(); // Reset to original values
+                              }}
+                              className="flex-1"
+                            >
+                              لغو
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">وضعیت:</span>
-                          <Badge className="bg-energy/10 text-energy border-energy/20">فعال</Badge>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">نام نمایشی:</span>
+                            <span className="font-medium">{profileData.display_name || 'تنظیم نشده'}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">شماره موبایل:</span>
+                            <span className="font-medium" dir="ltr">{profileData.phone || 'تنظیم نشده'}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">ایمیل:</span>
+                            <span className="font-medium">{user?.email}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">وضعیت:</span>
+                            <Badge className="bg-energy/10 text-energy border-energy/20">فعال</Badge>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">تاریخ عضویت:</span>
+                            <span className="font-medium">
+                              {user?.created_at ? formatDate(user.created_at) : '-'}
+                            </span>
+                          </div>
+                          <Button 
+                            onClick={() => setProfileEditing(true)} 
+                            className="w-full mt-4 bg-gradient-to-r from-accent to-accent border-accent/30 hover:shadow-lg"
+                          >
+                            <Edit className="w-4 h-4 ml-2" />
+                            ویرایش اطلاعات
+                          </Button>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">تاریخ عضویت:</span>
-                          <span className="font-medium">
-                            {user?.created_at ? formatDate(user.created_at) : '-'}
-                          </span>
-                        </div>
-                      </div>
-                      <Button variant="outline" className="w-full mt-4 border-accent/30 hover:bg-accent/10">
-                        <Edit className="w-4 h-4 ml-2" />
-                        ویرایش اطلاعات
-                      </Button>
+                      )}
                     </div>
                   </div>
                   
