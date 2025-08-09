@@ -12,8 +12,14 @@ export function Navbar() {
   const location = useLocation()
 
   const handleSignOut = async () => {
-    await signOut()
-    navigate('/')
+    try {
+      await signOut()
+      navigate('/')
+    } catch (error) {
+      console.error('Logout failed:', error)
+      // Still navigate to home even if logout fails
+      navigate('/')
+    }
   }
 
   const scrollToSection = (sectionId: string) => {
