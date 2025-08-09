@@ -292,10 +292,7 @@ export default function Admin() {
     try {
       const { data, error } = await supabase
         .from('payments')
-        .select(`
-          *,
-          profiles(display_name)
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
